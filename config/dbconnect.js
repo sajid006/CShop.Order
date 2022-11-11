@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const dbUrl = 'mongodb+srv://sajid:1234abcd@cshoporder.tpldnit.mongodb.net/test?retryWrites=true&w=majority';
+const dbUrl = process.env.MONGODB_URI;
 const db = async () => {
   mongoose
     .connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
