@@ -1,5 +1,6 @@
 const express = require('express');
 const orderRouter = require('./routes/orderRoutes');
+const cartRouter = require('./routes/cartRoutes');
 const helmet = require('helmet');
 const AppError = require('./utils/appError');
 require('./config/winston');
@@ -26,7 +27,8 @@ app.use(express.json());
 app.use(cookieParser());
 dbConnect();
 
-app.use('/api/v1/orders', orderRouter);
+app.use('/api/orders', orderRouter);
+app.use('/api/carts', cartRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Cannot find ${req.originalUrl} on this server`, 404));

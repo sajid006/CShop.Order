@@ -10,7 +10,7 @@ router
   .post(validation.verifyAdmin, orderAuthMiddleware.checkBody, orderController.postOrder);
 router
   .route('/:id')
-  .get(validation.verifyUser, orderController.getOrder)
+  .get(validation.verifyAdmin, orderAuthMiddleware.checkOrderExistence, orderController.getOrder)
   .patch(
     validation.verifyAdmin,
     orderAuthMiddleware.checkOrderExistence,
@@ -18,6 +18,6 @@ router
     orderController.patchOrder
   )
   .delete(validation.verifyAdmin, orderAuthMiddleware.checkOrderExistence, orderController.deleteOrder);
-router.route('/user/:id').get(orderController.getUserOrders);
+router.route('/user/:id').get(validation.verifyUser, orderController.getUserOrders);
 
 module.exports = router;

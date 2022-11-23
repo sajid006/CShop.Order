@@ -1,10 +1,10 @@
-const services = require('../services/orderServices');
+const services = require('../services/cartServices');
 const catchAsync = require('../utils/catchAsync');
 
-exports.checkOrderExistence = catchAsync(async (req, res, next) => {
+exports.checkCartExistence = catchAsync(async (req, res, next) => {
   const value = req.params.id;
-  const noOfOrder = await services.checkOrderId(value);
-  if (noOfOrder < 1) {
+  const noOfCart = await services.checkCartId(value);
+  if (noOfCart < 1) {
     return res.status(404).json({
       status: 'fail',
       message: 'Invalid Id',
@@ -13,7 +13,7 @@ exports.checkOrderExistence = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.checkBody = (req, res, next) => {
+exports.checkPostBody = (req, res, next) => {
   if (!req.body.userid) {
     return res.status(400).json({
       status: 'fail',
@@ -32,10 +32,20 @@ exports.checkBody = (req, res, next) => {
       message: 'Amount list missing',
     });
   }
-  if (!req.body.cost) {
+  next();
+};
+
+exports.checkUpdateBody = (req, res, next) => {
+  if (!req.body.products) {
     return res.status(400).json({
       status: 'fail',
-      message: 'Cost missing',
+      message: 'Product list missing',
+    });
+  }
+  if (!req.body.amounts) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Amount list missing',
     });
   }
   next();
