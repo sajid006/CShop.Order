@@ -20,18 +20,6 @@ exports.checkPostBody = (req, res, next) => {
       message: 'User id missing',
     });
   }
-  if (!req.body.products) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Product list missing',
-    });
-  }
-  if (!req.body.amounts) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Amount list missing',
-    });
-  }
   next();
 };
 

@@ -34,12 +34,47 @@ exports.postOrder = catchAsync(async (req, res, next) => {
     amounts: req.body.amounts,
     cost: req.body.cost,
   };
-  const userDetails = await axios.get(`https://cshopuser.azurewebsites.net/api/users`);
-  console.log(userDetails.data);
-  //check if all the products has amount greater than or equal to the given order
-  // If not, send error message ' only x pieces of this product is available'
+  const remAmount = [];
+  for (let i = 0; i < orderData.products.length; i++) {
+    const productid = orderData.products[i];
+    const amount = orderData.amounts[i];
+    try {
+      const response = await axios.get(`https://cshopapigateway.azurewebsites.net/api/product/${productid}`);
+      const productCount = response.data.stock * 1;
+      if (productCount < amount) {
+        const errResponse = `Only ${productCount} pieces of product ${response.data.name} is available`;
+        contentNegotiation.sendResponse(req, res, errResponse, 400);
+      }
+      const updatedProduct = {
+        name: response.data.name,
+        description: response.data.description,
+        price: response.data.price,
+        stock: productCount - amount,
+      };
+      remAmount.push(updatedProduct);
+    } catch {
+      const errResponse = `Product no ${productid} is unavailable`;
+      contentNegotiation.sendResponse(req, res, errResponse, 400);
+    }
+  }
   const newOrder = await services.createOrder(orderData);
   // Update the product service by reducing amount of each product
+  console.log('DONE');
+  const config = {
+    headers: {
+      Authorization: req.headers.authorization,
+    },
+  };
+  for (let i = 0; i < orderData.products.length; i++) {
+    const productid = orderData.products[i];
+    const url = `https://cshopapigateway.azurewebsites.net/api/product/${productid}`;
+    try {
+      const response = await axios.put(url, remAmount[i], config);
+      console.log(response.data);
+    } catch (err) {
+      contentNegotiation.sendResponse(req, res, err, 400);
+    }
+  }
   contentNegotiation.sendResponse(req, res, newOrder, 201);
 });
 
